@@ -3,17 +3,19 @@ import RevalidateButton from "../components/RevalidateButton";
 export const revalidate = 3600; // Revalidate the page every 1 hour
 
 async function fetchData() {
-  const url = `/api/cron/fetch-data?secret=${process.env.CRON_SECRET_KEY}`;
+  const url = `/api/cron/fetch-data?secret=${process.env.CRON_SECRET_KEY || "R1220K5"}`;
 
-  console.log("Fetching data from URL:", url); // Debug log
+  console.log("Fetching data from URL:", url);
 
   try {
-    const response = await fetch(url, { cache: "force-cache" });
-    console.log("Fetch response status:", response.status); // Debug log
-    console.log("Fetch response ok:", response.ok); // Debug log
+    const response = await fetch(url, {
+      next: { revalidate: 0 }, // Force revalidation on each fetch
+    });
+    console.log("Fetch response status:", response.status);
+    console.log("Fetch response ok:", response.ok);
 
     const result = await response.json();
-    console.log("Fetch result:", result); // Debug log
+    console.log("Fetch result:", result);
 
     if (!response.ok) {
       throw new Error(result.error || "Failed to fetch data");
@@ -21,7 +23,7 @@ async function fetchData() {
 
     return result;
   } catch (error) {
-    console.error("Error in fetchData:", error.message); // Debug log
+    console.error("Error in fetchData:", error.message);
     throw new Error(`Failed to fetch data: ${error.message}`);
   }
 }
@@ -35,10 +37,10 @@ export default async function Home() {
     const result = await fetchData();
     message = result.message;
     data = result.data || [];
-    console.log("Data fetched successfully:", data); // Debug log
+    console.log("Data fetched successfully:", data);
   } catch (err) {
     error = err.message;
-    console.error("Error in Home component:", error); // Debug log
+    console.error("Error in Home component:", error);
   }
 
   return (
