@@ -1,9 +1,9 @@
 import RevalidateButton from "../components/RevalidateButton";
 
-export const revalidate = 3600; // Revalidate the page every 1 hour
+export const revalidate = 3600;
 
 async function fetchData() {
-  const url = `/api/cron/fetch-data?secret=${process.env.CRON_SECRET_KEY || "R1220K5"}`;
+  const url = `/api/cron/fetch-data?secret=${process.env.CRON_SECRET_KEY}`;
 
   console.log("Fetching data from URL:", url);
 
