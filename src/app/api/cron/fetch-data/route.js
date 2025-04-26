@@ -22,7 +22,7 @@ export async function GET(request) {
 
     return NextResponse.json({
       message: "Cron job executed successfully!",
-      data: data.slice(0, 10), // Return 10 items as per initial request
+      data: data.slice(0, 10), 
     });
   } catch (error) {
     console.error("Error in cron job:", error);

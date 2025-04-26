@@ -20,7 +20,7 @@ export default function RevalidateButton() {
       }
 
       setMessage(result.message);
-      window.location.reload(); // Reload to show updated data
+      window.location.reload(); 
     } catch (err) {
       setError(err.message);
     } finally {
