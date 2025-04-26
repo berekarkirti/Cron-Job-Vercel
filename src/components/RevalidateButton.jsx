@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function RevalidateButton() {
+export default function RevalidateButton({ onDataFetched }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -12,16 +12,26 @@ export default function RevalidateButton() {
     setMessage('');
     setError('');
     try {
-      const response = await fetch('/api/cron/revalidate', { method: 'POST' });
-      const result = await response.json();
+      // Trigger revalidation
+      const revalidateResponse = await fetch('/api/revalidate', { method: 'POST' });
+      const revalidateResult = await revalidateResponse.json();
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to trigger revalidation');
+      if (!revalidateResponse.ok) {
+        throw new Error(revalidateResult.error || 'Failed to trigger revalidation');
       }
 
-      setMessage(result.message);
-      // Optionally reload the page to show the updated data
-      window.location.reload();
+      setMessage(revalidateResult.message);
+
+      // Fetch fresh data client-side
+      const dataResponse = await fetch('/api/cron/fetch-data?secret=R1220K5');
+      const dataResult = await dataResponse.json();
+
+      if (!dataResponse.ok) {
+        throw new Error(dataResult.error || 'Failed to fetch data');
+      }
+
+      // Pass the fetched data to the parent component
+      onDataFetched(dataResult.data);
     } catch (err) {
       setError(err.message);
     } finally {
