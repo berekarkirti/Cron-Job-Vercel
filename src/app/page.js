@@ -3,7 +3,7 @@ import RevalidateButton from "../components/RevalidateButton";
 export const revalidate = 3600;
 
 async function fetchData() {
-  const url = `/api/cron/fetch-data?secret=${process.env.CRON_SECRET_KEY}`;
+  const url = `https://jsonplaceholder.typicode.com/posts`;
 
   console.log("Fetching data from URL:", url);
 
