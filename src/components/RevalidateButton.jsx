@@ -12,7 +12,7 @@ export default function RevalidateButton() {
     setMessage('');
     setError('');
     try {
-      const response = await fetch('/api/revalidate', { method: 'POST' });
+      const response = await fetch('/api/cron/revalidate', { method: 'POST' });
       const result = await response.json();
 
       if (!response.ok) {
