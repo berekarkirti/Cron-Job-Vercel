@@ -2,14 +2,17 @@ import RevalidateButton from "../components/RevalidateButton";
 
 export const revalidate = 3600;
 
-async function fetchData() {
-  const url = `https://jsonplaceholder.typicode.com/posts`;
+async function fetchData() 
+{
+  const url = `https://cron-job-vercel-gamma.vercel.app/api/cron/fetch-data?secret=R1220K5`;
 
   console.log("Fetching data from URL:", url);
 
-  try {
-    const response = await fetch(url, {
-      next: { revalidate: 0 }, // Force revalidation on each fetch
+  try 
+  {
+    const response = await fetch(url, 
+    {
+      next: { revalidate: 0 }, 
     });
     console.log("Fetch response status:", response.status);
     console.log("Fetch response ok:", response.ok);
@@ -17,7 +20,8 @@ async function fetchData() {
     const result = await response.json();
     console.log("Fetch result:", result);
 
-    if (!response.ok) {
+    if (!response.ok) 
+    {
       throw new Error(result.error || "Failed to fetch data");
     }
 
