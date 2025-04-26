@@ -1,60 +1,77 @@
-'use client';
+import RevalidateButton from "../components/RevalidateButton";
 
-import { useState } from 'react';
+export const revalidate = 3600; // Revalidate the page every 1 hour
 
-export default function RevalidateButton({ onDataFetched }) {
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+async function fetchData() {
+  const url = `/api/cron/fetch-data?secret=${process.env.CRON_SECRET_KEY}`;
 
-  const handleRevalidate = async () => {
-    setLoading(true);
-    setMessage('');
-    setError('');
-    try {
-      // Trigger revalidation
-      const revalidateResponse = await fetch('/api/revalidate', { method: 'POST' });
-      const revalidateResult = await revalidateResponse.json();
+  console.log("Fetching data from URL:", url); // Debug log
 
-      if (!revalidateResponse.ok) {
-        throw new Error(revalidateResult.error || 'Failed to trigger revalidation');
-      }
+  try {
+    const response = await fetch(url, { cache: "force-cache" });
+    const result = await response.json();
 
-      setMessage(revalidateResult.message);
-
-      // Fetch fresh data client-side
-      const dataResponse = await fetch('/api/cron/fetch-data?secret=R1220K5');
-      const dataResult = await dataResponse.json();
-
-      if (!dataResponse.ok) {
-        throw new Error(dataResult.error || 'Failed to fetch data');
-      }
-
-      // Pass the fetched data to the parent component
-      onDataFetched(dataResult.data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(result.error || "Failed to fetch data");
     }
-  };
+
+    return result;
+  } catch (error) {
+    throw new Error(`Failed to fetch data: ${error.message}`);
+  }
+}
+
+export default async function Home() {
+  let data = [];
+  let message = "";
+  let error = "";
+
+  try {
+    const result = await fetchData();
+    message = result.message;
+    data = result.data || [];
+  } catch (err) {
+    error = err.message;
+  }
 
   return (
-    <div>
-      <button
-        onClick={handleRevalidate}
-        disabled={loading}
-        className={`px-6 py-2 rounded-lg font-semibold text-white transition-colors ${
-          loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-        }`}
-      >
-        {loading ? 'Revalidating...' : 'Refresh Data'}
-      </button>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Cron Job Data Fetcher</h1>
+
+      <RevalidateButton />
+
       {message && (
         <p className="mt-4 text-green-600 font-medium">{message}</p>
       )}
+
       {error && (
         <p className="mt-4 text-red-600 font-medium">{error}</p>
+      )}
+
+      {data.length > 0 && (
+        <div className="mt-6 w-full max-w-2xl">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">Fetched Data</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white shadow-md rounded-lg">
+              <thead>
+                <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                  <th className="py-3 px-6 text-left">ID</th>
+                  <th className="py-3 px-6 text-left">Title</th>
+                  <th className="py-3 px-6 text-left">Body</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-600 text-sm font-light">
+                {data.map((post) => (
+                  <tr key={post.id} className="border-b border-gray-200 hover:bg-gray-100">
+                    <td className="py-3 px-6 text-left">{post.id}</td>
+                    <td className="py-3 px-6 text-left">{post.title}</td>
+                    <td className="py-3 px-6 text-left">{post.body}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </div>
   );
