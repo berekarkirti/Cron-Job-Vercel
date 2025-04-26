@@ -1,0 +1,8 @@
+{
+    "crons": [
+      {
+        "path": "/api/cron/fetch-data?secret=R1220K5",
+        "schedule": "30 2 * * *"
+      }
+    ]
+  }
