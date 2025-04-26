@@ -20,7 +20,7 @@ export async function GET(request) {
 
     return NextResponse.json({
       message: "Cron job executed successfully!",
-      data: data.slice(0, 1),
+      data: data.slice(0, 10),
     });
   } catch (error) {
     console.error("Error in cron job:", error);
